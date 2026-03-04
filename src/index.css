@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: var(--brand-primary, #6366f1);
+  --color-brand-secondary: var(--brand-secondary, #0f172a);
+  --color-brand-background: var(--brand-background, #f8fafc);
+
+  --radius-2xl: 1rem;
+}
+
+:root {
+  --brand-primary: #6366f1;
+  --brand-secondary: #0f172a;
+  --brand-background: #f8fafc;
+}
+
+body {
+  @apply bg-brand-background text-brand-secondary antialiased;
+  font-family: 'Inter', sans-serif;
+}
