@@ -10,6 +10,7 @@ import Login from './pages/Auth/Login';
 import { BrandProvider } from './store/BrandContext';
 import { PostProvider } from './store/PostContext';
 import { AuthProvider, useAuth } from './store/AuthContext';
+import Settings from './pages/Settings/Settings';
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();
@@ -31,7 +32,7 @@ function App() {
                                 <Route path="analytics" element={<AnalyticsPage />} />
                                 <Route path="team" element={<TeamPage />} />
                                 <Route path="brands" element={<BrandsPage />} />
-                                <Route path="settings" element={<div className="p-8">Settings Page (Coming Soon)</div>} />
+                                <Route path="settings" element={<Settings />} />
                             </Route>
                         </Routes>
                     </Router>
