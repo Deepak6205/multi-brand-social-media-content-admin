@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePosts } from '../../store/PostContext';
 import { useBrand } from '../../store/BrandContext';
 import { CreatePostModal } from '../../components/dashboard/PostFlow';
+import { CommentsSystem } from '../../components/collaboration/CommentsSystem';
 
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -25,6 +26,7 @@ const KanbanPage = () => {
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
     const [visibleColumns, setVisibleColumns] = useState(new Set(initialColumns.map(c => c.id)));
+    const [selectedTask, setSelectedTask] = useState(null);
 
     const brandPosts = posts.filter(p => !activeBrand || p.brandId === activeBrand.id);
 
@@ -76,6 +78,7 @@ const KanbanPage = () => {
                             column={column}
                             tasks={brandPosts.filter(t => t.status === column.id)}
                             onMoveTask={moveTask}
+                            onSelectTask={setSelectedTask}
                         />
                     ))}
                 </div>
@@ -95,11 +98,17 @@ const KanbanPage = () => {
                 visibleColumns={visibleColumns}
                 onToggleVisibility={toggleColumnVisibility}
             />
+
+            <TaskDetailsModal
+                isOpen={!!selectedTask}
+                onClose={() => setSelectedTask(null)}
+                task={selectedTask}
+            />
         </div>
     );
 };
 
-const Column = ({ column, tasks, onMoveTask }) => {
+const Column = ({ column, tasks, onMoveTask, onSelectTask }) => {
     const [isOver, setIsOver] = useState(false);
 
     return (
@@ -133,7 +142,7 @@ const Column = ({ column, tasks, onMoveTask }) => {
             )}>
                 <AnimatePresence>
                     {tasks.map(task => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} onSelectTask={onSelectTask} />
                     ))}
                 </AnimatePresence>
 
@@ -146,7 +155,7 @@ const Column = ({ column, tasks, onMoveTask }) => {
     );
 };
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({ task, onSelectTask }) => {
     return (
         <motion.div
             layoutId={task.id}
@@ -170,7 +179,12 @@ const TaskCard = ({ task }) => {
                 )}>
                     {task.status}
                 </div>
-                <button className="p-1 text-slate-300 hover:text-slate-600 opacity-0 group-hover:opacity-100 transition-all">
+                <button 
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectTask(task);
+                    }}
+                    className="p-1 text-slate-300 hover:text-brand-primary opacity-0 group-hover:opacity-100 transition-all">
                     <MoreHorizontal size={14} />
                 </button>
             </div>
@@ -193,10 +207,16 @@ const TaskCard = ({ task }) => {
                 </div>
 
                 <div className="flex items-center gap-3 text-slate-400">
-                    <div className="flex items-center gap-1">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectTask(task);
+                        }}
+                        className="flex items-center gap-1 hover:text-brand-primary transition-colors cursor-pointer"
+                    >
                         <MessageSquare size={12} />
                         <span className="text-[10px] font-bold">{task.metrics.comments}</span>
-                    </div>
+                    </button>
                     <div className="flex items-center gap-1">
                         <Clock size={12} />
                         <span className="text-[10px] font-bold">Today</span>
@@ -207,6 +227,104 @@ const TaskCard = ({ task }) => {
                 </div>
             </div>
         </motion.div>
+    );
+};
+
+const TaskDetailsModal = ({ isOpen, onClose, task }) => {
+    if (!isOpen || !task) return null;
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <motion.div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden z-50"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                        <div className="flex h-full max-h-[85vh]">
+                            {/* Left Side - Task Details */}
+                            <div className="flex-1 p-8 border-r border-slate-100 overflow-y-auto">
+                                <div className="flex items-start justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-slate-900">Task Details</h2>
+                                    <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                                        <X size={24} className="text-slate-400" />
+                                    </button>
+                                </div>
+
+                                {task.mediaUrl && (
+                                    <div className="aspect-video w-full rounded-2xl overflow-hidden mb-6 bg-slate-50 border border-slate-100">
+                                        <img src={task.mediaUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    </div>
+                                )}
+
+                                <div className="space-y-6">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Caption</h3>
+                                        <p className="text-slate-800 font-medium leading-relaxed">{task.caption}</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Status</h3>
+                                            <div className={cn(
+                                                "px-3 py-1.5 rounded-lg text-xs font-bold w-fit",
+                                                task.status === 'scheduled' ? "bg-amber-50 text-amber-600" :
+                                                    task.status === 'published' ? "bg-emerald-50 text-emerald-600" :
+                                                        "bg-indigo-50 text-indigo-600"
+                                            )}>
+                                                {task.status.toUpperCase()}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Platform</h3>
+                                            <div className="flex items-center gap-2">
+                                                {task.platform === 'instagram' ? 
+                                                    <Instagram size={16} className="text-pink-600" /> : 
+                                                    <Youtube size={16} className="text-red-600" />
+                                                }
+                                                <span className="font-medium text-slate-800 capitalize">{task.platform}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Metrics</h3>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.likes}</p>
+                                                <p className="text-xs text-slate-500 mt-1">Likes</p>
+                                            </div>
+                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.comments}</p>
+                                                <p className="text-xs text-slate-500 mt-1">Comments</p>
+                                            </div>
+                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.shares}</p>
+                                                <p className="text-xs text-slate-500 mt-1">Shares</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right Side - Comments */}
+                            <div className="w-96 flex flex-col max-h-[85vh] overflow-hidden">
+                                <CommentsSystem />
+                            </div>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
     );
 };
 

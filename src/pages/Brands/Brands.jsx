@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Plus, Search, MoreHorizontal, Instagram, Youtube, Trash2, Edit3, Target, Palette, ExternalLink } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Instagram, Youtube, Trash2, Edit3, Target, Palette, ExternalLink, X, Check, Zap, Users, Calendar, BarChart3, Settings as SettingsIcon, BookOpen, Globe } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBrand } from '../../store/BrandContext';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -7,6 +8,158 @@ import { twMerge } from 'tailwind-merge';
 function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
+
+const FeaturesModal = ({ isOpen, onClose }) => {
+    const features = [
+        { icon: Target, title: 'Brand Management', desc: 'Create and manage multiple brands with custom themes and colors.' },
+        { icon: BarChart3, title: 'Analytics Dashboard', desc: 'Track performance, follower growth, and engagement metrics.' },
+        { icon: Calendar, title: 'Content Calendar', desc: 'Plan and schedule posts across different platforms.' },
+        { icon: Zap, title: 'Kanban Workflow', desc: 'Organize content through Draft, Review, Approved, Scheduled, and Published stages.' },
+        { icon: Users, title: 'Team Collaboration', desc: 'Invite team members and manage roles and permissions.' },
+        { icon: SettingsIcon, title: 'Settings Control', desc: 'Customize notifications, privacy, preferences, and security settings.' }
+    ];
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <motion.div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-50"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                        <div className="sticky top-0 bg-white border-b border-slate-100 px-8 py-6 flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-slate-900">Explore All Features</h2>
+                            <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X size={24} className="text-slate-400" />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {features.map((feature, idx) => {
+                                    const Icon = feature.icon;
+                                    return (
+                                        <motion.div
+                                            key={idx}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            className="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-primary/30 hover:shadow-lg transition-all group"
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                <div className="p-3 bg-brand-primary/10 rounded-xl group-hover:bg-brand-primary group-hover:text-white transition-all">
+                                                    <Icon size={24} className="text-brand-primary group-hover:text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-slate-900 mb-1">{feature.title}</h3>
+                                                    <p className="text-sm text-slate-600">{feature.desc}</p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+};
+
+const DocumentationModal = ({ isOpen, onClose }) => {
+    const docs = [
+        { icon: BookOpen, title: 'Getting Started', desc: 'Learn the basics and set up your first brand.' },
+        { icon: Users, title: 'Team Management', desc: 'Invite team members and configure permissions.' },
+        { icon: Calendar, title: 'Content Planning', desc: 'Master the calendar and workflow features.' },
+        { icon: BarChart3, title: 'Analytics Guide', desc: 'Understand metrics and performance data.' },
+        { icon: Globe, title: 'Platform Support', desc: 'Details about Instagram and YouTube integration.' },
+        { icon: SettingsIcon, title: 'Settings & Security', desc: 'Configure your account settings safely.' }
+    ];
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <motion.div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto z-50"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                        <div className="sticky top-0 bg-white border-b border-slate-100 px-8 py-6 flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-slate-900">Documentation</h2>
+                            <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X size={24} className="text-slate-400" />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {docs.map((doc, idx) => {
+                                    const Icon = doc.icon;
+                                    return (
+                                        <motion.a
+                                            key={idx}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            href="#"
+                                            className="p-6 bg-slate-50 rounded-2xl border border-slate-100 hover:border-brand-primary/30 hover:shadow-lg transition-all group cursor-pointer"
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                <div className="p-3 bg-brand-primary/10 rounded-xl group-hover:bg-brand-primary group-hover:text-white transition-all">
+                                                    <Icon size={24} className="text-brand-primary group-hover:text-white" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
+                                                        {doc.title}
+                                                        <ExternalLink size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    </h3>
+                                                    <p className="text-sm text-slate-600">{doc.desc}</p>
+                                                </div>
+                                            </div>
+                                        </motion.a>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="mt-8 pt-8 border-t border-slate-100">
+                                <h3 className="font-bold text-slate-900 mb-4">Need More Help?</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <a href="#" className="p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors text-center">
+                                        <p className="font-bold text-blue-900">📧 Contact Support</p>
+                                        <p className="text-xs text-blue-700 mt-1">Get help from our support team</p>
+                                    </a>
+                                    <a href="#" className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors text-center">
+                                        <p className="font-bold text-emerald-900">💬 Community Forum</p>
+                                        <p className="text-xs text-emerald-700 mt-1">Connect with other users</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+};
 
 const CreateBrandModal = ({ isOpen, onClose, onAdd }) => {
     const [name, setName] = useState('');
@@ -130,6 +283,8 @@ const BrandsPage = () => {
     const { brands, activeBrand, setActiveBrand, addBrand, deleteBrand } = useBrand();
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
+    const [isDocumentationModalOpen, setIsDocumentationModalOpen] = useState(false);
 
     const filteredBrands = brands.filter(b =>
         b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -258,10 +413,14 @@ const BrandsPage = () => {
                     <h2 className="text-4xl md:text-5xl font-black mb-6 leading-[1.1]">Organize your agency workflow with ease.</h2>
                     <p className="text-slate-400 text-lg mb-10 leading-relaxed font-medium">Switch between brands instantly. The entire dashboard adapts to your brand's theme, colors, and specific audience data.</p>
                     <div className="flex flex-wrap gap-4">
-                        <button className="px-8 py-4 bg-brand-primary text-white rounded-2xl font-bold hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all">
+                        <button 
+                            onClick={() => setIsFeaturesModalOpen(true)}
+                            className="px-8 py-4 bg-brand-primary text-white rounded-2xl font-bold hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all">
                             Explore All Features
                         </button>
-                        <button className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-bold hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2">
+                        <button 
+                            onClick={() => setIsDocumentationModalOpen(true)}
+                            className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-2xl font-bold hover:bg-white/20 transition-all border border-white/10 flex items-center gap-2">
                             Documentation <ExternalLink size={18} />
                         </button>
                     </div>
@@ -302,6 +461,16 @@ const BrandsPage = () => {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onAdd={addBrand}
+            />
+
+            <FeaturesModal
+                isOpen={isFeaturesModalOpen}
+                onClose={() => setIsFeaturesModalOpen(false)}
+            />
+
+            <DocumentationModal
+                isOpen={isDocumentationModalOpen}
+                onClose={() => setIsDocumentationModalOpen(false)}
             />
         </div>
     );
