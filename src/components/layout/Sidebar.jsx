@@ -64,7 +64,7 @@ export const Sidebar = () => {
                     </button>
                 </div>
 
-                <div className="px-4 py-6">
+                <div className="px-4 py-3">
                     <div className="relative">
                         <button
                             onClick={() => !collapsed && setShowBrands(!showBrands)}
@@ -138,7 +138,7 @@ export const Sidebar = () => {
                     ))}
                 </nav>
 
-                <div className="px-4 pb-8 space-y-2">
+                <div className="px-4 py-3 space-y-2 border-t border-slate-800">
                     {!collapsed && (
                         <button
                             onClick={() => setIsPostModalOpen(true)}
@@ -168,10 +168,10 @@ export const Sidebar = () => {
                     </NavLink>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 p-3 text-slate-400 hover:bg-red-500/10 hover:text-red-500 rounded-xl transition-all"
+                        className="w-full flex items-center gap-3 p-3 text-slate-300 hover:bg-red-500/20 hover:text-red-400 rounded-xl transition-all font-medium"
                     >
                         <LogOut size={22} />
-                        {!collapsed && <span className="font-medium">Logout</span>}
+                        {!collapsed && <span>Logout</span>}
                     </button>
                 </div>
             </aside>
