@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { TrendingUp, Users, Calendar as CalendarIcon, BarChart3, ArrowUpRight, ArrowDownRight, MoreHorizontal, Instagram, Youtube } from 'lucide-react';
+import { TrendingUp, Users, Calendar as CalendarIcon, BarChart3, ArrowUpRight, ArrowDownRight, MoreHorizontal, Instagram, Youtube, X, Download, Check } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBrand } from '../../store/BrandContext';
 import { usePosts } from '../../store/PostContext';
 import { CreatePostModal } from '../../components/dashboard/PostFlow';
@@ -10,6 +11,102 @@ import { CreatePostModal } from '../../components/dashboard/PostFlow';
 function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
+
+const ExportReportModal = ({ isOpen, onClose, onExport, hasData }) => {
+    const [exported, setExported] = useState(false);
+
+    const handleExport = () => {
+        onExport();
+        setExported(true);
+        setTimeout(() => {
+            setExported(false);
+            onClose();
+        }, 1500);
+    };
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <motion.div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-96 max-h-[90vh] overflow-y-auto z-50"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                        <div className="sticky top-0 bg-white border-b border-slate-100 px-8 py-6 flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-slate-900">Export Report</h2>
+                            <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
+                                <X size={24} className="text-slate-400" />
+                            </button>
+                        </div>
+
+                        <div className="p-8">
+                            {!exported ? (
+                                <>
+                                    {hasData ? (
+                                        <div className="space-y-4">
+                                            <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                                <p className="text-sm font-medium text-blue-900">📊 Report Details</p>
+                                                <p className="text-xs text-blue-700 mt-2">Download a CSV file containing all your posts with detailed metrics including likes, comments, and shares.</p>
+                                            </div>
+                                            <button
+                                                onClick={handleExport}
+                                                className="w-full py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Download size={20} />
+                                                Export Report
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <motion.div
+                                            className="py-8 text-center"
+                                            initial={{ opacity: 0, scale: 0.8 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                        >
+                                            <motion.div
+                                                className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                            >
+                                                <span className="text-3xl">📭</span>
+                                            </motion.div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">No Posts Available</h3>
+                                            <p className="text-slate-500 font-medium">Create some posts first to export a report.</p>
+                                        </motion.div>
+                                    )}
+                                </>
+                            ) : (
+                                <motion.div
+                                    className="py-8 text-center"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                >
+                                    <motion.div
+                                        className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                    >
+                                        <Check size={32} className="text-emerald-600" />
+                                    </motion.div>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">Report Exported!</h3>
+                                    <p className="text-slate-500 font-medium">Your CSV file has been downloaded successfully.</p>
+                                </motion.div>
+                            )}
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
+    );
+};
 
 const data = [
     { name: 'Mon', followers: 4000, engagement: 2400 },
@@ -44,6 +141,7 @@ const Dashboard = () => {
     const { activeBrand } = useBrand();
     const { posts } = usePosts();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
     const brandPosts = posts.filter(p => !activeBrand || p.brandId === activeBrand.id);
     const activePostsCount = brandPosts.filter(p => p.status === 'scheduled' || p.status === 'pending').length;
@@ -52,10 +150,6 @@ const Dashboard = () => {
         .slice(0, 3);
 
     const handleExportReport = () => {
-        if (brandPosts.length === 0) {
-            alert('No posts available for export');
-            return;
-        }
         const csvRows = [
             ['ID', 'Caption', 'Platform', 'Status', 'Scheduled Date', 'Likes', 'Comments', 'Shares'],
             ...brandPosts.map(post => [
@@ -78,6 +172,10 @@ const Dashboard = () => {
         URL.revokeObjectURL(link.href);
     };
 
+    const handleOpenExportModal = () => {
+        setIsExportModalOpen(true);
+    };
+
     const handleNewStrategy = () => {
         setIsModalOpen(true);
     };
@@ -93,7 +191,7 @@ const Dashboard = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={handleExportReport}
+                        onClick={handleOpenExportModal}
                         className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         Export Report
@@ -106,6 +204,13 @@ const Dashboard = () => {
                     </button>
                 </div>
             </div>
+
+            <ExportReportModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                onExport={handleExportReport}
+                hasData={brandPosts.length > 0}
+            />
 
             <CreatePostModal
                 isOpen={isModalOpen}

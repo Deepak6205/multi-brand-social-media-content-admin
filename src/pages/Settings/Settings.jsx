@@ -138,13 +138,15 @@ const Settings = () => {
 
                 {/* Content Area */}
                 <div className="md:col-span-3">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 space-y-8"
-                    >
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{ duration: 0.3 }}
+                            className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 space-y-8"
+                        >
                         {/* Profile Tab */}
                         {activeTab === 'profile' && (
                             <div className="space-y-6">
@@ -523,7 +525,8 @@ const Settings = () => {
                                 </div>
                             </div>
                         )}
-                    </motion.div>
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
         </div>
