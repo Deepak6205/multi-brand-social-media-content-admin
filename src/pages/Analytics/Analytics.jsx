@@ -1,5 +1,5 @@
-import React from 'react';
-import { Share2, BarChart3, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Share2, BarChart3, TrendingUp, X, Copy, Check } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
@@ -35,6 +35,65 @@ const HeatmapCell = ({ value }) => {
 };
 
 const AnalyticsPage = () => {
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const insightsSummary = `📊 ANALYTICS REPORT
+Generated: ${new Date().toLocaleString()}
+
+📈 FOLLOWER GROWTH FACTOR
+- Week 7: 3,490 followers (Instagram)
+- Week 7: 4,300 engagement (YouTube)
+
+🎯 PLATFORM DISTRIBUTION
+- Instagram: 65% of audience
+- YouTube: 35% of audience
+
+⚡ KEY INSIGHTS
+1. Optimal Post Time: Thursdays at 6:00 PM (45% higher engagement)
+2. Virality Potential: Short-form video content (<30s) has 3x higher share rate
+3. Best Performing Platform: Instagram leads with 65% audience distribution
+
+📱 RECOMMENDATION
+Focus on publishing short-form video content on Thursdays at 6:00 PM for maximum reach and engagement.`;
+
+    const handleExportPDF = () => {
+        const csvContent = `Analytics Report,${new Date().toISOString()}
+Follower Growth Data,
+Week,Instagram,YouTube
+Week 1,4000,2400
+Week 2,3000,1398
+Week 3,2000,3800
+Week 4,2780,3908
+Week 5,1890,4800
+Week 6,2390,3800
+Week 7,3490,4300
+
+Platform Distribution,
+Platform,Percentage
+Instagram,65%
+YouTube,35%
+
+Smart Insights,
+Optimal Post Time,Thursdays at 6:00 PM (45% higher engagement)
+Virality Potential,Video content under 30s has 3x higher share rate
+
+Report Generated,${new Date().toLocaleString()}`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `analytics-report-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    };
+
+    const handleCopyInsights = () => {
+        navigator.clipboard.writeText(insightsSummary);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -43,10 +102,16 @@ const AnalyticsPage = () => {
                     <p className="text-slate-500 font-medium mt-1">Deep dive into your brand's cross-platform performance.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                    <button
+                        onClick={handleExportPDF}
+                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                    >
                         Export PDF
                     </button>
-                    <button className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all">
+                    <button
+                        onClick={() => setIsShareModalOpen(true)}
+                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all"
+                    >
                         Share Insights
                     </button>
                 </div>
@@ -175,6 +240,70 @@ const AnalyticsPage = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <ShareInsightsModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                insightsSummary={insightsSummary}
+                onCopy={handleCopyInsights}
+                copied={copied}
+            />
+        </div>
+    );
+};
+
+const ShareInsightsModal = ({ isOpen, onClose, insightsSummary, onCopy, copied }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose}></div>
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-10 p-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-slate-900">Share Insights</h2>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+                    >
+                        <X size={20} className="text-slate-400" />
+                    </button>
+                </div>
+
+                <div className="bg-slate-50 rounded-2xl p-6 mb-6 max-h-96 overflow-y-auto">
+                    <p className="text-xs text-slate-400 font-mono leading-relaxed whitespace-pre-wrap">
+                        {insightsSummary}
+                    </p>
+                </div>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={onCopy}
+                        className={`flex-1 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${
+                            copied
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : 'bg-brand-primary text-white hover:shadow-lg hover:shadow-brand-primary/20'
+                        }`}
+                    >
+                        {copied ? (
+                            <>
+                                <Check size={18} />
+                                Copied!
+                            </>
+                        ) : (
+                            <>
+                                <Copy size={18} />
+                                Copy to Clipboard
+                            </>
+                        )}
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                    >
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

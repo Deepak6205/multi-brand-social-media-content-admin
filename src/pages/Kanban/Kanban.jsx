@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Plus, MoreHorizontal, MessageSquare, Clock, Instagram, Youtube } from 'lucide-react';
+import { Plus, MoreHorizontal, MessageSquare, Clock, Instagram, Youtube, X, Eye, EyeOff } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePosts } from '../../store/PostContext';
 import { useBrand } from '../../store/BrandContext';
+import { CreatePostModal } from '../../components/dashboard/PostFlow';
 
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -21,12 +22,27 @@ const initialColumns = [
 const KanbanPage = () => {
     const { posts, updatePostStatus } = usePosts();
     const { activeBrand } = useBrand();
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+    const [isColumnsModalOpen, setIsColumnsModalOpen] = useState(false);
+    const [visibleColumns, setVisibleColumns] = useState(new Set(initialColumns.map(c => c.id)));
 
     const brandPosts = posts.filter(p => !activeBrand || p.brandId === activeBrand.id);
 
     const moveTask = (taskId, newColumn) => {
         updatePostStatus(taskId, newColumn);
     };
+
+    const toggleColumnVisibility = (columnId) => {
+        const newVisible = new Set(visibleColumns);
+        if (newVisible.has(columnId)) {
+            newVisible.delete(columnId);
+        } else {
+            newVisible.add(columnId);
+        }
+        setVisibleColumns(newVisible);
+    };
+
+    const displayedColumns = initialColumns.filter(c => visibleColumns.has(c.id));
 
     return (
         <div className="h-full flex flex-col space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -36,10 +52,16 @@ const KanbanPage = () => {
                     <p className="text-slate-500 font-medium mt-1">Manage your content production pipeline. Drag tasks between columns.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                    <button
+                        onClick={() => setIsColumnsModalOpen(true)}
+                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                    >
                         Manage Columns
                     </button>
-                    <button className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2">
+                    <button
+                        onClick={() => setIsPostModalOpen(true)}
+                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2"
+                    >
                         <Plus size={20} />
                         <span>New Task</span>
                     </button>
@@ -48,7 +70,7 @@ const KanbanPage = () => {
 
             <div className="flex-1 overflow-x-auto pb-8 -mx-8 px-8">
                 <div className="flex gap-6 min-h-full min-w-max">
-                    {initialColumns.map(column => (
+                    {displayedColumns.map(column => (
                         <Column
                             key={column.id}
                             column={column}
@@ -58,6 +80,21 @@ const KanbanPage = () => {
                     ))}
                 </div>
             </div>
+
+            <CreatePostModal
+                isOpen={isPostModalOpen}
+                onClose={() => setIsPostModalOpen(false)}
+                initialPlatform={activeBrand?.platform || 'instagram'}
+                initialStatus="draft"
+            />
+
+            <ManageColumnsModal
+                isOpen={isColumnsModalOpen}
+                onClose={() => setIsColumnsModalOpen(false)}
+                columns={initialColumns}
+                visibleColumns={visibleColumns}
+                onToggleVisibility={toggleColumnVisibility}
+            />
         </div>
     );
 };
@@ -170,6 +207,56 @@ const TaskCard = ({ task }) => {
                 </div>
             </div>
         </motion.div>
+    );
+};
+
+const ManageColumnsModal = ({ isOpen, onClose, columns, visibleColumns, onToggleVisibility }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose}></div>
+            <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-10 p-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-slate-900">Manage Columns</h2>
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+                    >
+                        <X size={20} className="text-slate-400" />
+                    </button>
+                </div>
+
+                <div className="space-y-3">
+                    {columns.map(column => (
+                        <button
+                            key={column.id}
+                            onClick={() => onToggleVisibility(column.id)}
+                            className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all border border-slate-200 hover:border-slate-300"
+                        >
+                            <div className="text-left">
+                                <p className="font-bold text-slate-900">{column.title}</p>
+                                <p className="text-xs text-slate-400 mt-1 capitalize">{column.id}</p>
+                            </div>
+                            {visibleColumns.has(column.id) ? (
+                                <Eye size={18} className="text-emerald-600" />
+                            ) : (
+                                <EyeOff size={18} className="text-slate-400" />
+                            )}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="mt-8 flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+                    >
+                        Done
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 };
 

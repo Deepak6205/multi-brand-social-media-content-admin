@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { usePosts } from '../../store/PostContext';
 import { useBrand } from '../../store/BrandContext';
+import { CreatePostModal } from '../../components/dashboard/PostFlow';
 
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -19,6 +20,7 @@ const statusColors = {
 
 const CalendarPage = () => {
     const [view, setView] = useState('month');
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
     const { posts } = usePosts();
     const { activeBrand } = useBrand();
 
@@ -58,7 +60,10 @@ const CalendarPage = () => {
                     <button className="p-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
                         <Filter size={20} />
                     </button>
-                    <button className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2">
+                    <button
+                        onClick={() => setIsPostModalOpen(true)}
+                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2"
+                    >
                         <Plus size={20} />
                         <span>Create Post</span>
                     </button>
@@ -159,6 +164,12 @@ const CalendarPage = () => {
                     })}
                 </div>
             </div>
+
+            <CreatePostModal
+                isOpen={isPostModalOpen}
+                onClose={() => setIsPostModalOpen(false)}
+                initialPlatform={activeBrand?.platform || 'instagram'}
+            />
         </div>
     );
 };

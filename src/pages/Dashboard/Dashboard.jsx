@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { TrendingUp, Users, Calendar as CalendarIcon, BarChart3, ArrowUpRight, ArrowDownRight, MoreHorizontal, Instagram, Youtube } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useBrand } from '../../store/BrandContext';
 import { usePosts } from '../../store/PostContext';
+import { CreatePostModal } from '../../components/dashboard/PostFlow';
 
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -41,11 +43,44 @@ const StatCard = ({ title, value, change, trend, icon: Icon }) => (
 const Dashboard = () => {
     const { activeBrand } = useBrand();
     const { posts } = usePosts();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const brandPosts = posts.filter(p => !activeBrand || p.brandId === activeBrand.id);
     const activePostsCount = brandPosts.filter(p => p.status === 'scheduled' || p.status === 'pending').length;
-    const publishedPosts = brandPosts.filter(p => p.status === 'published').slice(0, 3);
+    const recentPosts = [...brandPosts]
+        .sort((a, b) => new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime())
+        .slice(0, 3);
 
+    const handleExportReport = () => {
+        if (brandPosts.length === 0) {
+            alert('No posts available for export');
+            return;
+        }
+        const csvRows = [
+            ['ID', 'Caption', 'Platform', 'Status', 'Scheduled Date', 'Likes', 'Comments', 'Shares'],
+            ...brandPosts.map(post => [
+                post.id,
+                `"${post.caption.replace(/"/g, '""')}"`,
+                post.platform,
+                post.status,
+                post.scheduledDate,
+                post.metrics?.likes ?? 0,
+                post.metrics?.comments ?? 0,
+                post.metrics?.shares ?? 0
+            ])
+        ];
+        const csvString = csvRows.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `${activeBrand?.name || 'all-brands'}-posts-${new Date().toISOString().slice(0,10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    };
+
+    const handleNewStrategy = () => {
+        setIsModalOpen(true);
+    };
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -57,14 +92,26 @@ const Dashboard = () => {
                     <p className="text-slate-500 font-medium mt-1">Global performance overview for your brand.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+                    <button
+                        onClick={handleExportReport}
+                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                    >
                         Export Report
                     </button>
-                    <button className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all">
+                    <button
+                        onClick={handleNewStrategy}
+                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all"
+                    >
                         + New Strategy
                     </button>
                 </div>
             </div>
+
+            <CreatePostModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                initialPlatform={activeBrand?.platform || 'instagram'}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Total Followers" value={(activeBrand?.followers || 0).toLocaleString()} change="+12" trend="up" icon={Users} />
@@ -169,23 +216,26 @@ const Dashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-                <div className="xl:col-span-3 bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-                    <h3 className="text-xl font-bold text-slate-900 mb-6">Recent Content</h3>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                <div className="xl:col-span-3 bg-white rounded-3xl border border-slate-100 shadow-lg p-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-slate-900">Recent Content</h3>
+                        <button className="text-xs font-bold uppercase tracking-wide px-3 py-2 rounded-full border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition">Show All</button>
+                    </div>
+                    <div className="relative overflow-x-auto">
+                        <table className="w-full text-left border-separate border-spacing-y-3">
                             <thead>
-                                <tr className="border-b border-slate-50">
-                                    <th className="pb-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Content</th>
-                                    <th className="pb-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Date</th>
-                                    <th className="pb-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Engagement</th>
-                                    <th className="pb-4 text-sm font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                                    <th className="pb-4"></th>
+                                <tr className="bg-slate-50 rounded-xl">
+                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Content</th>
+                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Engagement</th>
+                                    <th className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                                    <th className="px-4 py-3" />
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
-                                {publishedPosts.length > 0 ? publishedPosts.map((post, i) => (
-                                    <tr key={post.id} className="group hover:bg-slate-50 transition-colors">
-                                        <td className="py-4">
+                                {recentPosts.length > 0 ? recentPosts.map((post, i) => (
+                                    <tr key={post.id} className="group hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-b-0">
+                                        <td className="py-4 px-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 rounded-xl bg-slate-100 flex-shrink-0 overflow-hidden">
                                                     {post.mediaUrl ? (
@@ -199,10 +249,10 @@ const Dashboard = () => {
                                                 <span className="font-bold text-slate-700 line-clamp-1">{post.caption}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4">
+                                        <td className="py-4 px-4">
                                             <span className="text-sm font-medium text-slate-400">{new Date(post.scheduledDate).toLocaleDateString()}</span>
                                         </td>
-                                        <td className="py-4">
+                                        <td className="py-4 px-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
                                                     <div className="h-full bg-brand-primary rounded-full transition-all duration-1000" style={{ width: i === 0 ? '85%' : i === 1 ? '65%' : '45%' }}></div>
@@ -210,9 +260,9 @@ const Dashboard = () => {
                                                 <span className="text-sm font-bold text-slate-700">{i === 0 ? '8.5%' : i === 1 ? '6.2%' : '4.1%'}</span>
                                             </div>
                                         </td>
-                                        <td className="py-4">
+                                        <td className="py-4 px-4">
                                             <span className={cn(
-                                                "px-3 py-1 text-xs font-bold rounded-lg uppercase",
+                                                "px-3 py-1 text-xs font-bold rounded-full uppercase",
                                                 post.status === 'published' ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
                                             )}>
                                                 {post.status}
@@ -234,7 +284,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
+                <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group self-start h-[280px] min-h-[280px] max-h-[280px]">
                     <div className="relative z-10">
                         <h3 className="text-xl font-bold mb-2">Power up with AI</h3>
                         <p className="text-slate-400 text-sm mb-8 leading-relaxed">Let our AI suggest the best captions and posting times for maximum engagement.</p>
@@ -242,8 +292,8 @@ const Dashboard = () => {
                             Generate Now
                         </button>
                     </div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/10 blur-2xl rounded-full -ml-12 -mb-12"></div>
+                    <div className="absolute top-0 right-0 w-36 h-36 bg-brand-primary/20 blur-3xl rounded-full -mr-20 -mt-20 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-28 h-28 bg-purple-500/10 blur-2xl rounded-full -ml-16 -mb-16 pointer-events-none"></div>
                 </div>
             </div>
         </div>
