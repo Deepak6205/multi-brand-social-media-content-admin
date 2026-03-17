@@ -95,32 +95,32 @@ Report Generated,${new Date().toLocaleString()}`;
     };
 
     return (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Advanced Analytics</h1>
-                    <p className="text-slate-500 font-medium mt-1">Deep dive into your brand's cross-platform performance.</p>
+        <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">Advanced Analytics</h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Deep dive into your brand's cross-platform performance.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                     <button
                         onClick={handleExportPDF}
-                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-white border border-slate-200 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap"
                     >
                         Export PDF
                     </button>
                     <button
                         onClick={() => setIsShareModalOpen(true)}
-                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-brand-primary text-white rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all whitespace-nowrap"
                     >
                         Share Insights
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 col-span-2">
-                    <h3 className="text-xl font-bold text-slate-900 mb-8">Follower Growth Factor</h3>
-                    <div className="h-[350px]">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-6 lg:p-8">
+                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-8">Follower Growth Factor</h3>
+                    <div className="h-[250px] sm:h-[300px] lg:h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={lineData}>
                                 <defs>

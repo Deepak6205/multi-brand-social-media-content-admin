@@ -292,28 +292,28 @@ const BrandsPage = () => {
     );
 
     return (
-        <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Brand Management</h1>
-                    <p className="text-slate-500 font-medium mt-1">Organize and switch between your client brands.</p>
+        <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">Brand Management</h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Organize and switch between your client brands.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="relative">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                    <div className="relative w-full sm:w-auto">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search brands..."
-                            className="pl-12 pr-6 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-primary/20 outline-none w-full md:w-64 text-sm font-medium shadow-sm transition-all"
+                            placeholder="Search..."
+                            className="pl-12 pr-6 py-2 sm:py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-primary/20 outline-none w-full sm:max-w-64 text-xs sm:text-sm font-medium shadow-sm transition-all"
                         />
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2 whitespace-nowrap"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-brand-primary text-white rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center sm:justify-start gap-2 whitespace-nowrap"
                     >
-                        <Plus size={20} />
+                        <Plus size={18} sm:size={20} />
                         <span>Add Brand</span>
                     </button>
                 </div>

@@ -172,41 +172,39 @@ const TeamPage = () => {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <InviteMemberModal 
                 isOpen={isInviteModalOpen} 
                 onClose={() => setIsInviteModalOpen(false)}
                 onInvite={handleInviteMember}
             />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Team Members</h1>
-                    <p className="text-slate-500 font-medium mt-1">Manage roles and permissions for your agency team.</p>
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">Team Members</h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Manage roles and permissions for your agency team.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => setIsInviteModalOpen(true)}
-                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2">
-                        <UserPlus size={20} />
-                        <span>Invite Member</span>
-                    </button>
-                </div>
+                <button 
+                    onClick={() => setIsInviteModalOpen(true)}
+                    className="px-4 sm:px-6 py-2 sm:py-3 bg-brand-primary text-white rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center sm:justify-start gap-2 whitespace-nowrap">
+                    <UserPlus size={18} sm:size={20} />
+                    <span>Invite Member</span>
+                </button>
             </div>
 
             <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="relative">
+                <div className="p-4 sm:p-6 border-b border-slate-50 flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="relative w-full sm:w-auto">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                         <input
                             type="text"
-                            placeholder="Search by name or email..."
-                            className="pl-12 pr-6 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-primary/20 outline-none w-full md:w-80 text-sm font-medium"
+                            placeholder="Search..."
+                            className="pl-12 pr-6 py-2 sm:py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-primary/20 outline-none w-full sm:max-w-80 text-xs sm:text-sm font-medium"
                         />
                     </div>
-                    <div className="flex gap-2">
-                        <button className="px-4 py-2 bg-slate-50 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all">All Roles</button>
-                        <button className="px-4 py-2 bg-slate-50 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all">Active</button>
+                    <div className="flex gap-2 overflow-x-auto">
+                        <button className="px-3 sm:px-4 py-2 bg-slate-50 text-xs sm:text-sm text-slate-600 rounded-xl font-bold hover:bg-slate-100 transition-all whitespace-nowrap">All Roles</button>
+                        <button className="px-3 sm:px-4 py-2 bg-slate-50 text-xs sm:text-sm text-slate-600 rounded-xl font-bold hover:bg-slate-100 transition-all whitespace-nowrap">Active</button>
                     </div>
                 </div>
 

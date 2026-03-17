@@ -180,25 +180,25 @@ const Dashboard = () => {
         setIsModalOpen(true);
     };
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+        <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 flex items-center gap-2 sm:gap-3 break-words">
                         {activeBrand?.name} Dashboard
-                        {activeBrand?.platform === 'instagram' ? <Instagram size={24} className="text-pink-600" /> : <Youtube size={24} className="text-red-600" />}
+                        {activeBrand?.platform === 'instagram' ? <Instagram size={20} sm:size={24} className="text-pink-600 flex-shrink-0" /> : <Youtube size={20} sm:size={24} className="text-red-600 flex-shrink-0" />}
                     </h1>
-                    <p className="text-slate-500 font-medium mt-1">Global performance overview for your brand.</p>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Global performance overview for your brand.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                     <button
                         onClick={handleOpenExportModal}
-                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-white border border-slate-200 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap"
                     >
                         Export Report
                     </button>
                     <button
                         onClick={handleNewStrategy}
-                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-brand-primary text-white rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all whitespace-nowrap"
                     >
                         + New Strategy
                     </button>
@@ -218,16 +218,16 @@ const Dashboard = () => {
                 initialPlatform={activeBrand?.platform || 'instagram'}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 <StatCard title="Total Followers" value={(activeBrand?.followers || 0).toLocaleString()} change="+12" trend="up" icon={Users} />
                 <StatCard title="Avg. Engagement" value="4.82%" change="+2.4" trend="up" icon={TrendingUp} />
                 <StatCard title="Active Posts" value={activePostsCount.toString()} change="+2" trend="up" icon={CalendarIcon} />
                 <StatCard title="Monthly Reach" value="850.4K" change="+14" trend="up" icon={BarChart3} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-8 overflow-hidden">
-                    <div className="flex items-center justify-between mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-4 sm:p-6 md:p-8 overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
                         <div>
                             <h3 className="text-xl font-bold text-slate-900">Follower Growth</h3>
                             <p className="text-sm text-slate-400 font-medium">Tracking growth over the last 7 days</p>

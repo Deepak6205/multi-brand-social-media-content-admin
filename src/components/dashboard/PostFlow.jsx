@@ -68,7 +68,7 @@ export const CreatePostModal = ({ isOpen, onClose }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose}></div>
 
-            <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-10 flex flex-col md:flex-row h-[95vh]">
+            <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-50 flex flex-col md:flex-row h-[95vh]">
                 <div className="flex-1 p-8 overflow-y-auto space-y-8">
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold text-slate-900">Create New Post</h2>

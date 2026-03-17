@@ -47,24 +47,24 @@ const KanbanPage = () => {
     const displayedColumns = initialColumns.filter(c => visibleColumns.has(c.id));
 
     return (
-        <div className="h-full flex flex-col space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Workflow Board</h1>
-                    <p className="text-slate-500 font-medium mt-1">Manage your content production pipeline. Drag tasks between columns.</p>
+        <div className="h-full flex flex-col space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900">Workflow Board</h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">Manage your content production pipeline. Drag tasks between columns.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                     <button
                         onClick={() => setIsColumnsModalOpen(true)}
-                        className="px-6 py-3 bg-white border border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50 transition-all shadow-sm"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-white border border-slate-200 rounded-xl font-bold text-xs sm:text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm whitespace-nowrap"
                     >
                         Manage Columns
                     </button>
                     <button
                         onClick={() => setIsPostModalOpen(true)}
-                        className="px-6 py-3 bg-brand-primary text-white rounded-xl font-bold hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center gap-2"
+                        className="px-4 sm:px-6 py-2 sm:py-3 bg-brand-primary text-white rounded-xl font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-primary/20 transition-all flex items-center justify-center sm:justify-start gap-2 whitespace-nowrap"
                     >
-                        <Plus size={20} />
+                        <Plus size={18} sm:size={20} />
                         <span>New Task</span>
                     </button>
                 </div>
@@ -245,36 +245,36 @@ const TaskDetailsModal = ({ isOpen, onClose, task }) => {
                         onClick={onClose}
                     />
                     <motion.div
-                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden z-50"
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-3xl shadow-2xl w-full mx-4 sm:mx-6 max-w-sm sm:max-w-2xl lg:max-w-4xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden z-50"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                     >
-                        <div className="flex h-full max-h-[85vh]">
+                        <div className="flex flex-col lg:flex-row h-full max-h-[90vh] sm:max-h-[85vh]">
                             {/* Left Side - Task Details */}
-                            <div className="flex-1 p-8 border-r border-slate-100 overflow-y-auto">
-                                <div className="flex items-start justify-between mb-6">
-                                    <h2 className="text-2xl font-bold text-slate-900">Task Details</h2>
-                                    <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                                        <X size={24} className="text-slate-400" />
+                            <div className="flex-1 p-4 sm:p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-slate-100 overflow-y-auto">
+                                <div className="flex items-start justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+                                    <h2 className="text-lg sm:text-2xl font-bold text-slate-900">Task Details</h2>
+                                    <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0">
+                                        <X size={20} sm:size={24} className="text-slate-400" />
                                     </button>
                                 </div>
 
                                 {task.mediaUrl && (
-                                    <div className="aspect-video w-full rounded-2xl overflow-hidden mb-6 bg-slate-50 border border-slate-100">
+                                    <div className="aspect-video w-full rounded-2xl overflow-hidden mb-4 sm:mb-6 bg-slate-50 border border-slate-100">
                                         <img src={task.mediaUrl} alt="Preview" className="w-full h-full object-cover" />
                                     </div>
                                 )}
 
-                                <div className="space-y-6">
+                                <div className="space-y-4 sm:space-y-6">
                                     <div>
-                                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Caption</h3>
-                                        <p className="text-slate-800 font-medium leading-relaxed">{task.caption}</p>
+                                        <h3 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Caption</h3>
+                                        <p className="text-sm sm:text-base text-slate-800 font-medium leading-relaxed">{task.caption}</p>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                         <div>
-                                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Status</h3>
+                                            <h3 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Status</h3>
                                             <div className={cn(
                                                 "px-3 py-1.5 rounded-lg text-xs font-bold w-fit",
                                                 task.status === 'scheduled' ? "bg-amber-50 text-amber-600" :
@@ -285,31 +285,31 @@ const TaskDetailsModal = ({ isOpen, onClose, task }) => {
                                             </div>
                                         </div>
                                         <div>
-                                            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Platform</h3>
+                                            <h3 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Platform</h3>
                                             <div className="flex items-center gap-2">
                                                 {task.platform === 'instagram' ? 
                                                     <Instagram size={16} className="text-pink-600" /> : 
                                                     <Youtube size={16} className="text-red-600" />
                                                 }
-                                                <span className="font-medium text-slate-800 capitalize">{task.platform}</span>
+                                                <span className="text-xs sm:text-sm font-medium text-slate-800 capitalize">{task.platform}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Metrics</h3>
-                                        <div className="grid grid-cols-3 gap-3">
-                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
-                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.likes}</p>
-                                                <p className="text-xs text-slate-500 mt-1">Likes</p>
+                                        <h3 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest mb-3">Metrics</h3>
+                                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                                            <div className="p-2 sm:p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-lg sm:text-2xl font-bold text-brand-primary">{task.metrics.likes}</p>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Likes</p>
                                             </div>
-                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
-                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.comments}</p>
-                                                <p className="text-xs text-slate-500 mt-1">Comments</p>
+                                            <div className="p-2 sm:p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-lg sm:text-2xl font-bold text-brand-primary">{task.metrics.comments}</p>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Comments</p>
                                             </div>
-                                            <div className="p-3 bg-slate-50 rounded-xl text-center">
-                                                <p className="text-2xl font-bold text-brand-primary">{task.metrics.shares}</p>
-                                                <p className="text-xs text-slate-500 mt-1">Shares</p>
+                                            <div className="p-2 sm:p-3 bg-slate-50 rounded-xl text-center">
+                                                <p className="text-lg sm:text-2xl font-bold text-brand-primary">{task.metrics.shares}</p>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Shares</p>
                                             </div>
                                         </div>
                                     </div>
@@ -317,7 +317,7 @@ const TaskDetailsModal = ({ isOpen, onClose, task }) => {
                             </div>
 
                             {/* Right Side - Comments */}
-                            <div className="w-96 flex flex-col max-h-[85vh] overflow-hidden">
+                            <div className="w-full lg:w-96 flex flex-col max-h-[400px] sm:max-h-[300px] lg:max-h-[85vh] overflow-hidden">
                                 <CommentsSystem />
                             </div>
                         </div>
@@ -334,9 +334,9 @@ const ManageColumnsModal = ({ isOpen, onClose, columns, visibleColumns, onToggle
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose}></div>
-            <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-10 p-8">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-slate-900">Manage Columns</h2>
+            <div className="bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 relative z-10 p-6 sm:p-8">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                    <h2 className="text-lg sm:text-2xl font-bold text-slate-900">Manage Columns</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
@@ -345,7 +345,7 @@ const ManageColumnsModal = ({ isOpen, onClose, columns, visibleColumns, onToggle
                     </button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                     {columns.map(column => (
                         <button
                             key={column.id}
