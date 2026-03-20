@@ -1,8 +1,10 @@
 import { Search, Bell, Command, ChevronDown, LogOut, User as UserIcon, Menu } from 'lucide-react';
 import { useAuth } from '../../store/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export const Header = ({ onMenuToggle }) => {
     const { logout, user } = useAuth();
+    const navigate = useNavigate();
 
     return (
         <header className="h-16 sm:h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30">
@@ -30,7 +32,9 @@ export const Header = ({ onMenuToggle }) => {
             </div>
 
             <div className="flex items-center gap-3 sm:gap-6">
-                <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
+                <button 
+                    onClick={() => navigate('/settings?tab=notifications')}
+                    className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
                     <Bell size={22} />
                     <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </button>
@@ -50,7 +54,9 @@ export const Header = ({ onMenuToggle }) => {
                     </button>
 
                     <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all pointer-events-none group-hover:pointer-events-auto p-2 border-slate-200/50 backdrop-blur-xl">
-                        <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all text-sm font-bold">
+                        <button 
+                            onClick={() => navigate('/settings?tab=profile')}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all text-sm font-bold">
                             <UserIcon size={18} className="text-slate-400" />
                             Account Settings
                         </button>

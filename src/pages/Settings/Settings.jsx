@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Lock, Eye, Globe, Mail, Shield, ChevronRight, Save, Upload, Moon, Sun, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 
 const SuccessNotification = ({ show, message }) => {
     return (
@@ -36,9 +37,18 @@ const SettingTab = ({ icon: Icon, label, isActive, onClick }) => (
 );
 
 const Settings = () => {
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('profile');
     const [showSuccess, setShowSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
+
+    // Set active tab from query parameter
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (tabParam) {
+            setActiveTab(tabParam);
+        }
+    }, [searchParams]);
 
     // Profile Settings State
     const [profile, setProfile] = useState({
