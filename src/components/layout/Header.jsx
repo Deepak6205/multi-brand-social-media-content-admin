@@ -1,14 +1,43 @@
+import { useState, useEffect } from 'react';
 import { Search, Bell, Command, ChevronDown, LogOut, User as UserIcon, Menu } from 'lucide-react';
 import { useAuth } from '../../store/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+const PROFILE_STORAGE_KEY = 'app-profile-settings';
+
 export const Header = ({ onMenuToggle }) => {
     const { logout, user } = useAuth();
+    const [profile, setProfile] = useState(() => {
+        const storedProfile = window.localStorage.getItem(PROFILE_STORAGE_KEY);
+        return storedProfile ? JSON.parse(storedProfile) : null;
+    });
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const syncProfile = () => {
+            const storedProfile = window.localStorage.getItem(PROFILE_STORAGE_KEY);
+            setProfile(storedProfile ? JSON.parse(storedProfile) : null);
+        };
+
+        window.addEventListener('storage', syncProfile);
+        window.addEventListener('profileUpdated', syncProfile);
+
+        return () => {
+            window.removeEventListener('storage', syncProfile);
+            window.removeEventListener('profileUpdated', syncProfile);
+        };
+    }, []);
+
+    const displayName = profile?.name || user?.email.split('@')[0] || 'Admin';
+    const displayInitials = (profile?.name || user?.email.split('@')[0] || 'Admin')
+        .split(' ')
+        .map((part) => part[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
 
     return (
         <header className="h-16 sm:h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30">
-            {/* Mobile menu button */}
             <button
                 onClick={onMenuToggle}
                 className="md:hidden p-2 -ml-2 hover:bg-slate-100 rounded-lg transition-colors"
@@ -32,9 +61,10 @@ export const Header = ({ onMenuToggle }) => {
             </div>
 
             <div className="flex items-center gap-3 sm:gap-6">
-                <button 
+                <button
                     onClick={() => navigate('/settings?tab=notifications')}
-                    className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all">
+                    className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all"
+                >
                     <Bell size={22} />
                     <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </button>
@@ -43,20 +73,25 @@ export const Header = ({ onMenuToggle }) => {
 
                 <div className="relative group">
                     <button className="flex items-center gap-2 sm:gap-3 pl-1 pr-2 py-1 hover:bg-slate-100 rounded-2xl transition-all group-hover:bg-slate-50">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
-                            {user?.email[0].toUpperCase() || 'A'}
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 overflow-hidden flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-200">
+                            {profile?.imageUrl ? (
+                                <img src={profile.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                displayInitials
+                            )}
                         </div>
                         <div className="hidden sm:block md:hidden lg:block text-left">
-                            <p className="text-sm font-bold text-slate-800">{user?.email.split('@')[0] || 'Admin'}</p>
+                            <p className="text-sm font-bold text-slate-800">{displayName}</p>
                             <p className="text-xs font-medium text-slate-400 uppercase tracking-tight">Super Admin</p>
                         </div>
                         <ChevronDown size={16} className="text-slate-400 group-hover:text-slate-600 transition-colors hidden sm:block" />
                     </button>
 
                     <div className="absolute top-full right-0 mt-2 w-52 bg-white border border-slate-100 rounded-[1.5rem] shadow-2xl opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all pointer-events-none group-hover:pointer-events-auto p-2 border-slate-200/50 backdrop-blur-xl">
-                        <button 
+                        <button
                             onClick={() => navigate('/settings?tab=profile')}
-                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all text-sm font-bold">
+                            className="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all text-sm font-bold"
+                        >
                             <UserIcon size={18} className="text-slate-400" />
                             Account Settings
                         </button>

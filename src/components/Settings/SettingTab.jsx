@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ChevronRight } from 'lucide-react';
 
 const SettingTab = ({ icon: Icon, label, isActive, onClick }) => (
@@ -7,7 +7,7 @@ const SettingTab = ({ icon: Icon, label, isActive, onClick }) => (
         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left font-medium ${
             isActive
                 ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+                : 'text-slate-600 hover:bg-slate-50'
         }`}
     >
         <Icon size={20} />
