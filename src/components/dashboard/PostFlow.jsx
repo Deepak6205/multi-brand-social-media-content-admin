@@ -9,9 +9,9 @@ function cn(...inputs) {
     return twMerge(clsx(inputs));
 }
 
-export const CreatePostModal = ({ isOpen, onClose }) => {
+export const CreatePostModal = ({ isOpen, onClose, initialPlatform }) => {
     const [caption, setCaption] = useState('');
-    const [platform, setPlatform] = useState('instagram');
+    const [platform, setPlatform] = useState(initialPlatform || 'instagram');
     const [generating, setGenerating] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const fileInputRef = useRef(null);

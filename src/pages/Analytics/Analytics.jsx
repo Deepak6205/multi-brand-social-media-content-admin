@@ -1,24 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Share2, BarChart3, TrendingUp, X, Copy, Check } from 'lucide-react';
+import { usePosts } from '../../store/PostContext';
+import { useBrand } from '../../store/BrandContext';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell
 } from 'recharts';
 
-const lineData = [
-    { name: 'Week 1', ig: 4000, yt: 2400 },
-    { name: 'Week 2', ig: 3000, yt: 1398 },
-    { name: 'Week 3', ig: 2000, yt: 3800 },
-    { name: 'Week 4', ig: 2780, yt: 3908 },
-    { name: 'Week 5', ig: 1890, yt: 4800 },
-    { name: 'Week 6', ig: 2390, yt: 3800 },
-    { name: 'Week 7', ig: 3490, yt: 4300 },
-];
-
-const pieData = [
-    { name: 'Instagram', value: 65, color: '#E1306C' },
-    { name: 'YouTube', value: 35, color: '#FF0000' },
-];
+const dateFormatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
 
 const HeatmapCell = ({ value }) => {
     const opacity = value / 100;
@@ -37,25 +26,76 @@ const HeatmapCell = ({ value }) => {
 const AnalyticsPage = () => {
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const { posts } = usePosts();
+    const { activeBrand } = useBrand();
+
+    const brandPosts = useMemo(
+        () => activeBrand ? posts.filter(post => post.brandId === activeBrand.id) : posts,
+        [posts, activeBrand]
+    );
+
+    const statusCounts = useMemo(
+        () => brandPosts.reduce((acc, post) => {
+            acc[post.status] = (acc[post.status] || 0) + 1;
+            return acc;
+        }, {}),
+        [brandPosts]
+    );
+
+    const platformCounts = useMemo(
+        () => brandPosts.reduce((acc, post) => {
+            const key = post.platform || 'other';
+            acc[key] = (acc[key] || 0) + 1;
+            return acc;
+        }, { instagram: 0, youtube: 0, other: 0 }),
+        [brandPosts]
+    );
+
+    const lineData = useMemo(() => {
+        const now = new Date();
+        return Array.from({ length: 7 }, (_, index) => {
+            const day = new Date(now);
+            day.setDate(now.getDate() - (6 - index));
+            const dayKey = day.toISOString().slice(0, 10);
+            return {
+                name: dateFormatter.format(day),
+                ig: brandPosts.filter(post => post.platform === 'instagram' && post.scheduledDate.slice(0, 10) === dayKey).length,
+                yt: brandPosts.filter(post => post.platform === 'youtube' && post.scheduledDate.slice(0, 10) === dayKey).length,
+            };
+        });
+    }, [brandPosts]);
+
+    const pieData = useMemo(() => [
+        { name: 'Instagram', value: platformCounts.instagram, color: '#E1306C' },
+        { name: 'YouTube', value: platformCounts.youtube, color: '#FF0000' },
+    ], [platformCounts]);
+
+    const totalPosts = brandPosts.length;
+    const publishedCount = statusCounts.published || 0;
+    const scheduledCount = statusCounts.scheduled || 0;
+    const pendingCount = statusCounts.pending || 0;
+    const topPlatform = platformCounts.instagram >= platformCounts.youtube ? 'Instagram' : 'YouTube';
+    const topPlatformShare = totalPosts ? Math.round((platformCounts[topPlatform.toLowerCase()] || 0) / totalPosts * 100) : 0;
+    const reportBrand = activeBrand?.name || 'All Brands';
 
     const insightsSummary = `📊 ANALYTICS REPORT
 Generated: ${new Date().toLocaleString()}
 
-📈 FOLLOWER GROWTH FACTOR
-- Week 7: 3,490 followers (Instagram)
-- Week 7: 4,300 engagement (YouTube)
+📊 Brand: ${reportBrand}
+- Total posts: ${totalPosts}
+- Published: ${publishedCount}
+- Scheduled: ${scheduledCount}
+- Pending: ${pendingCount}
 
-🎯 PLATFORM DISTRIBUTION
-- Instagram: 65% of audience
-- YouTube: 35% of audience
+📈 Platform distribution:
+- Instagram: ${platformCounts.instagram}
+- YouTube: ${platformCounts.youtube}
 
-⚡ KEY INSIGHTS
-1. Optimal Post Time: Thursdays at 6:00 PM (45% higher engagement)
-2. Virality Potential: Short-form video content (<30s) has 3x higher share rate
-3. Best Performing Platform: Instagram leads with 65% audience distribution
+🎯 Top performing platform: ${topPlatform} (${topPlatformShare}%)
 
-📱 RECOMMENDATION
-Focus on publishing short-form video content on Thursdays at 6:00 PM for maximum reach and engagement.`;
+💡 Recommendation:
+Keep publishing consistent content on ${topPlatform} and review scheduled posts to improve engagement.
+`;
 
     const handleExportPDF = () => {
         const csvContent = `Analytics Report,${new Date().toISOString()}

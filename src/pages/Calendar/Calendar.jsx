@@ -19,15 +19,53 @@ const statusColors = {
 };
 
 const CalendarPage = () => {
+    const today = new Date();
     const [view, setView] = useState('month');
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+    const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+    const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const { posts } = usePosts();
     const { activeBrand } = useBrand();
 
-    
-    const days = Array.from({ length: 35 }, (_, i) => i - 3);
-
     const brandPosts = posts.filter(p => !activeBrand || p.brandId === activeBrand.id);
+
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const startOffset = firstDayOfMonth.getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const totalCells = 35;
+    const days = Array.from({ length: totalCells }, (_, idx) => {
+        const dayNumber = idx - startOffset + 1;
+        const date = new Date(currentYear, currentMonth, dayNumber);
+        return {
+            date,
+            day: dayNumber,
+            isCurrentMonth: date.getMonth() === currentMonth
+        };
+    });
+
+    const monthDisplay = firstDayOfMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const showToday = () => {
+        setCurrentMonth(today.getMonth());
+        setCurrentYear(today.getFullYear());
+    };
+    const previousMonth = () => {
+        setCurrentMonth(prev => {
+            if (prev === 0) {
+                setCurrentYear(year => year - 1);
+                return 11;
+            }
+            return prev - 1;
+        });
+    };
+    const nextMonth = () => {
+        setCurrentMonth(prev => {
+            if (prev === 11) {
+                setCurrentYear(year => year + 1);
+                return 0;
+            }
+            return prev + 1;
+        });
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -73,16 +111,16 @@ const CalendarPage = () => {
             <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
                 <div className="flex items-center justify-between p-6 border-b border-slate-100">
                     <div className="flex items-center gap-4">
-                        <h2 className="text-xl font-bold text-slate-900">March 2026</h2>
+                        <h2 className="text-xl font-bold text-slate-900">{monthDisplay}</h2>
                         <div className="flex items-center gap-1">
-                            <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400">
+                            <button onClick={previousMonth} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400">
                                 <ChevronLeft size={20} />
                             </button>
-                            <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400">
+                            <button onClick={nextMonth} className="p-2 hover:bg-slate-100 rounded-lg text-slate-400">
                                 <ChevronRight size={20} />
                             </button>
                         </div>
-                        <button className="px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary/5 rounded-lg transition-all">
+                        <button onClick={showToday} className="px-4 py-2 text-sm font-bold text-brand-primary hover:bg-brand-primary/5 rounded-lg transition-all">
                             Today
                         </button>
                     </div>
@@ -112,13 +150,12 @@ const CalendarPage = () => {
 
                 <div className="grid grid-cols-7 auto-rows-[160px]">
                     {days.map((day, i) => {
-                        const isCurrentMonth = day > 0 && day <= 31;
-
-                        
-                        const dayPosts = brandPosts.filter(p => {
-                            const postDate = new Date(p.scheduledDate);
-                            return postDate.getMonth() === 2 && postDate.getDate() === day; 
-                        });
+                        const isCurrentMonth = day.isCurrentMonth;
+                        const todayDate = new Date();
+                        const isToday = isCurrentMonth &&
+                            day.date.getDate() === todayDate.getDate() &&
+                            day.date.getMonth() === todayDate.getMonth() &&
+                            day.date.getFullYear() === todayDate.getFullYear();
 
                         return (
                             <div
@@ -131,13 +168,18 @@ const CalendarPage = () => {
                                 <span className={cn(
                                     "text-sm font-bold inline-flex items-center justify-center w-8 h-8 rounded-full transition-all",
                                     isCurrentMonth ? "text-slate-700" : "text-slate-300",
-                                    day === new Date().getDate() ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/30" : ""
+                                    isToday ? "bg-brand-primary text-white shadow-lg shadow-brand-primary/30" : ""
                                 )}>
-                                    {day > 0 ? day : day + 31}
+                                    {day.date.getDate()}
                                 </span>
 
                                 <div className="mt-2 space-y-1 overflow-hidden">
-                                    {dayPosts.map(post => (
+                                    {brandPosts.filter(post => {
+                                        const postDate = new Date(post.scheduledDate);
+                                        return postDate.getFullYear() === day.date.getFullYear() &&
+                                            postDate.getMonth() === day.date.getMonth() &&
+                                            postDate.getDate() === day.date.getDate();
+                                    }).map(post => (
                                         <div
                                             key={post.id}
                                             className={cn(
